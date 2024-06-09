@@ -1,0 +1,28 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "glivs.fullname" . }}-ingress
+  namespace: {{ .Values.application.namespace }}
+  labels:
+    {{- include "glivs.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/issuer: {{ .Values.issuer.name }}
+spec:
+  ingressClassName: {{ .Values.ingress.classname }}
+  rules:
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: {{ .Values.ingress.path }}
+        backend:
+          service:
+            name: {{ include "glivs.fullname" . }}
+            port:
+              number: {{ .Values.service.port }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: {{ .Values.ingress.tlsSecretName }}
+{{- end }}

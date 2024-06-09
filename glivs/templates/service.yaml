@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "glivs.fullname" . }}
+  namespace: {{ .Values.application.namespace }}
+  labels:
+    {{- include "glivs.labels" . | nindent 4 }}
+spec:
+  type: {{ if .Values.ingress.enabled }}ClusterIP{{- else }}LoadBalancer{{- end }}
+  ports:
+    - port: {{ .Values.service.port }}
+      name: https
+      targetPort: {{ .Values.service.targetPort }}
+  selector:
+    app: {{ .Values.application.app.name }}

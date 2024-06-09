@@ -1,0 +1,66 @@
+# Default values for glivs.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+application:
+  host: "glivs-mysql-primary"
+  namespace: app
+  existingSecret: "secrets-application"
+  replicaCount: 1
+  app:
+    name: glivs-app
+  image:
+    repository: 644435390668.dkr.ecr.ap-south-1.amazonaws.com/dan-portfolio-app
+    tag: 1.0.2
+  service:
+    port: 5000
+  resources:
+    enabled: false
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+
+postgresql:
+  port_for_app: 5432
+  architecture: standalone
+  primary:
+    persistence:
+      enabled: true
+      size: 5Gi
+  auth:
+    username: flask_app
+    database: flask_app
+    existingSecret: "secrets-pg"
+    secretKeys:
+      adminPasswordKey: postgres_admin_password
+      userPasswordKey: postgres_user_password
+      
+configmap:
+  name: config
+  data:
+    loglevel: "info"
+    presistance: "true"
+
+service:
+  port: 80
+  targetPort: 5000
+
+ingress:
+  enabled: true
+  host: glivs.com
+  path: /
+  tlsSecretName: letsencrypt-prod-pub
+  classname: nginx
+
+issuer:
+  enabled: true
+  name: letsencrypt
+  acme:
+    # server: https://acme-v02.api.letsencrypt.org/directory
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: support@glivs.com
+    privateKeySecretRef:
+      name: letsencrypt-prod

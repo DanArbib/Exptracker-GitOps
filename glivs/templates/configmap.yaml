@@ -1,0 +1,11 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configmap.name }}
+  namespace: {{ .Values.application.namespace }}
+data:
+  POSTGRES_DB: {{ .Values.postgresql.auth.database | quote }}
+  POSTGRES_USER: {{ .Values.postgresql.auth.username | quote }}
+  PG_PORT: {{ .Values.postgresql.port_for_app | quote }}
+  PG_HOST: {{ include "postgresql.v1.primary.fullname" .Subcharts.postgresql | quote }}

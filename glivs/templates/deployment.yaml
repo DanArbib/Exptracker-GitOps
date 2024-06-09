@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "glivs.fullname" . }}
+  namespace: {{ .Values.application.namespace }}
+  labels:
+    {{- include "glivs.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.application.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.application.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.application.app.name }}
+    spec:
+      containers:
+      - name: {{ .Values.application.app.name }}
+        image: {{ .Values.application.image.repository }}:{{ .Values.application.image.tag }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: {{ .Values.application.service.port }}
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.configmap.name }}
+        env:
+        - name: FLASK_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.application.existingSecret }}
+              key: flask_secret_key
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.application.existingSecret }}
+              key: jwt_secret_key
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.application.existingSecret }}
+              key: postgres_user_password
+        {{- if .Values.application.resources.enabled -}}
+        resources:
+          requests:
+            memory: {{ .Values.application.resources.requests.memory }}
+            cpu: {{ .Values.application.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.application.resources.limits.memory }}
+            cpu: {{ .Values.application.resources.limits.cpu }}
+        {{- end }}
