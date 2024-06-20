@@ -3,7 +3,7 @@ name: glivs
 description: A Helm chart for glivs
 type: application
 version: 0.1.0
-appVersion: ""
+appVersion: "1.0.0"
 dependencies:
   - name: postgresql
     version: 15.5.0
