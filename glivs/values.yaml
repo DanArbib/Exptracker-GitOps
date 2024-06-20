@@ -11,7 +11,7 @@ application:
     name: glivs-app
   image:
     repository: 644435390668.dkr.ecr.ap-south-1.amazonaws.com/dan-portfolio-app
-    tag: 1.0.2
+    tag: ""
   service:
     port: 5000
   resources:
@@ -22,7 +22,6 @@ application:
     requests:
       cpu: "250m"
       memory: "256Mi"
-
 postgresql:
   port_for_app: 5432
   architecture: standalone
@@ -37,24 +36,20 @@ postgresql:
     secretKeys:
       adminPasswordKey: postgres_admin_password
       userPasswordKey: postgres_user_password
-      
 configmap:
   name: config
   data:
     loglevel: "info"
     presistance: "true"
-
 service:
   port: 80
   targetPort: 5000
-
 ingress:
   enabled: true
   host: glivs.com
   path: /
   tlsSecretName: letsencrypt-prod-pub
   classname: nginx
-
 issuer:
   enabled: true
   name: letsencrypt
